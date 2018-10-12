@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "mmemory.h"
 
 void test_malloc() {
@@ -78,6 +79,63 @@ void test_init() {
         else if (retCode == 1)
             printf("Init unknown error\n");
     }
+}
+
+void test_all(){
+    _init(1, 40);
+    char *userBuff =(char*) calloc(1,50);
+    VA *p1 = (VA*) malloc(sizeof(VA));
+    int retCode = _malloc(p1, 20);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == 1)
+        printf("Unknown error\n");
+
+    retCode = _write(0, userBuff, 5);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == -2)
+        printf("Max block size");
+    else if (retCode == 1)
+        printf("Unknown error\n");
+
+    retCode = _write((VA) 1, userBuff, 10);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == -2)
+        printf("Max block size");
+    else if (retCode == 1)
+        printf("Unknown error\n");
+
+    retCode = _read(0, userBuff, 5);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == 1)
+        printf("Unknown error\n");
+
+    retCode = _read((VA) 1, userBuff, 10);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == 1)
+        printf("Unknown error\n");
+
+    retCode = _free(0);
+    if (retCode == 0)
+        printf("Complete!\n");
+    else if (retCode == -1)
+        printf("Has wrong parameters\n");
+    else if (retCode == 1)
+        printf("Unknown error\n");
 }
 
 int main()

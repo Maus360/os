@@ -4,6 +4,10 @@
 
 //typedef char* VA;
 
+#include <stdlib.h>
+#include <memory.h>
+#include "mmemory.h"
+
 struct block {
     struct block*	pNext;	// следующий свободный или
     // занятый блок

@@ -88,5 +88,3 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer);
 	@retval	1	неизвестная ошибка
  **/
 int _init (int n, int szPage);
-
-void print();
