@@ -2,13 +2,6 @@
 // Created by maksi on 11.10.2018.
 //
 
-#include "mmemory.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-
 //typedef char* VA;
 
 struct block {
@@ -311,23 +304,4 @@ int _read(VA ptr, void* pBuffer, size_t szBuffer){
     }
     return -1;
 
-}
-
-
-void print(){
-    struct block* pointer = begin;
-    int i=0;
-    int shift=0;
-    while(pointer!=NULL){
-        unsigned int blockSize = getSize(pointer->szBlock);
-        if(isUsedBlock(pointer->szBlock))
-            printf("used block, size=%d ", blockSize);
-        else printf("free block, size=%d ", blockSize);
-        for(i=0;i<blockSize;i++){
-            printf("%c", *(memory+i+shift));
-        }
-        printf("\n");
-        shift+=blockSize;
-        pointer = pointer->pNext;
-    }
 }
