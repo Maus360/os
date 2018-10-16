@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <memory.h>
+#include <stdio.h>
 #include "mmemory.h"
 
 struct block {
@@ -264,7 +265,7 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer){
 	@retval	0	успешное выполнение
 	@retval	-1	неверные параметры
 	@retval	-2	доступ за пределы блока
-	@retval	1	неизвестная ошибка
+	@retval	1	неизвестная ошибка3
  **/
 int _read(VA ptr, void* pBuffer, size_t szBuffer){
     unsigned int ptrBlock = (unsigned int) ptr;
