@@ -54,7 +54,7 @@ unsigned getSize(unsigned int size){
 	@retval	-1	неверные параметры
 	@retval	1	неизвестная ошибка
  **/
-int _init(int n, int szPage){
+int _init_(int n, int szPage) {
 
     int d = setUsedBlock(52);
     //d = getSize(d);
@@ -308,5 +308,22 @@ int _read(VA ptr, void* pBuffer, size_t szBuffer){
         pointer = pointer->pNext;
     }
     return -1;
+}
 
+void print() {
+    struct block *pointer = begin;
+    int i = 0;
+    int shift = 0;
+    while (pointer != NULL) {
+        unsigned int blockSize = getSize(pointer->szBlock);
+        if (isUsedBlock(pointer->szBlock))
+            printf("used block, size=%d ", blockSize);
+        else printf("free block, size=%d ", blockSize);
+        for (i = 0; i < blockSize; i++) {
+            printf("%c", *(memory + i + shift));
+        }
+        printf("\n");
+        shift += blockSize;
+        pointer = pointer->pNext;
+    }
 }

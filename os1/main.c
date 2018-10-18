@@ -41,7 +41,7 @@ int test_all(){
     char *userBuff =(char*) calloc(1,50);
     int retCode;
     *p1=p2;
-    _init(1,40);
+    _init_(1, 40);
 
     while(c!='0'){
         printf("0.Exit\n1.malloc\n2.free\n3.read\n4.write\n5.CLS\n");
@@ -84,7 +84,14 @@ int test_all(){
             printf("buffer=%s\n",userBuff);
             scanf("%c", &c);
         }
-        if(c=='5') {system("cls"); scanf("%c", &c);}
+        if (c == '5') {
+            system("cls");
+            scanf("%c", &c);
+        }
+        if (c == '6') {
+            print();
+            scanf("%c", &c);
+        }
     }
 
     scanf("%c", &c);
@@ -94,8 +101,8 @@ int main()
 {
 //    test_malloc_size_block_more_than_real_block_size();
 //    test_malloc_used_block();
-    test_malloc_size_block_equals_real_block_size();
-//    test_all();
+//    test_malloc_size_block_equals_real_block_size();
+    test_all();
 
     return 0;
 }
