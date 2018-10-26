@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "mmemory.h"
 
 struct block {
@@ -157,8 +158,8 @@ int _free(VA ptr){
     unsigned int ptrBlock =(unsigned int) (ptr);
     unsigned int shift=0;
 
+    if (begin == NULL) return 1;
     if(ptrBlock<0 || ptrBlock>memorySize) return -1;
-    if(begin==NULL) return 1;
     if(ptr<0)  return -1;
 
     while(pointer!=NULL){
@@ -211,7 +212,7 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer){
 
     if(pointer==NULL) return 1;
     if(pBuffer==NULL) return -1;
-    if(szBuffer<1) return -1;
+    if (szBuffer < 1 || szBuffer > memorySize) return -1;
     if(ptrBlock >= 0 && ptrBlock < memorySize){
         // указатель на область памяти корректен
         // находим, какому блоку принадлежит указатель
@@ -219,7 +220,7 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer){
             curBlockSize = getSize(pointer->szBlock);
             if(ptrBlock>=shift && ptrBlock<shift+curBlockSize){
                 // адрес попадает в текущий блок
-                // нужно проверить, а выделен лми блок для записи\чтения
+                // нужно проверить, а выделен ли блок для записи\чтения
                 if(isUsedBlock(pointer->szBlock)){
                     // блок выделен
                     // проверяем, нет ли выхода за пределы блока
@@ -294,7 +295,7 @@ int _read(VA ptr, void* pBuffer, size_t szBuffer){
                     return 0;
                 }
                 else{
-                    // выход за пределы блока при попытке записи
+                    // выход за пределы блока при попытке чтения
                     return -2;
                 }
 
