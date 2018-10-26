@@ -8,29 +8,182 @@ void test_malloc_without_init() {
     VA *p1 = (VA*) malloc(sizeof(VA));
     assert(_malloc(p1, 5) == 1);
 }
+
 void test_malloc_negative_size_block(){
     VA *p1 = (VA*) malloc(sizeof(VA));
-    _init(1, 40);
+    _init_(1, 40);
     assert(_malloc(p1, -1) == -1);
 }
+
 void test_malloc_size_block_more_than_real_block_size(){
     VA *p1 = (VA*) malloc(sizeof(VA));
-    _init(1,20);
+    _init_(1, 20);
     assert(_malloc(p1, 30) == -2);
 }
+
 void test_malloc_used_block(){
     VA *p1 = (VA*) malloc(sizeof(VA));
-    _init(1,40);
+    _init_(1, 40);
     _malloc(p1, 20);
     _malloc(p1, 20);
     assert(_malloc(p1, 20) == -2);
 }
+
 void test_malloc_size_block_equals_real_block_size(){
     VA *p1 = (VA*) malloc(sizeof(VA));
-    _init(1,50);
+    _init_(1, 50);
     assert(_malloc(p1, 50) == 0);
 }
-void test_malloc_size_block_less_than_real_block_size(){}
+
+void test_malloc_size_block_less_than_real_block_size() {
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _init_(1, 50);
+    assert(_malloc(p1, 40) == 0);
+}
+
+void test_init_negative_page_count() {
+    assert(_init_(-2, 40) == -1);
+}
+
+void test_init_negative_page_size() {
+    assert(_init_(1, -30) == -1);
+}
+
+void test_free_wrong_begin_pointer() {
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    assert(_free(p1) == 1);
+}
+
+void test_free_not_enougth_memory() {
+    _init_(1, 20);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 10);
+    assert(_free(30) == -1);
+}
+
+void test_free_not_used_block() {
+    _init_(1, 20);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 10);
+    assert(_free(10) == 1);
+}
+
+void test_free_used_block() {
+    _init_(1, 20);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 1);
+    assert(_free(0) == 0);
+}
+
+void test_write_unintialized_memory() {
+    assert(_write(0, 5, 5) == 1);
+}
+
+void test_write_null_buffer() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_write((VA) 0, NULL, 5) == -1);
+}
+
+void test_write_wrong_size_buffer() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_write((VA) 0, 5, -2) == -1);
+}
+
+void test_write_wrong_pointer() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_write((VA) 41, 5, 5) == -1);
+}
+
+void test_write_free_block() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    _free(0);
+    assert(_write(0, 5, 5) == 1);
+}
+
+void test_write_size_of_buffer_bigger_than_size_of_block() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_write(0, 5, 10) == -2);
+}
+
+void test_write() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_write((VA) 0, "da", 4) == 0);
+}
+
+void test_read_unintialized_memory() {
+    assert(_read(0, 5, 5) == 1);
+}
+
+void test_read_null_buffer() {
+    _init_(1, 40);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_read((VA) 0, NULL, 5) == -1);
+}
+
+void test_read_wrong_size_buffer() {
+    _init_(1, 40);
+    char *userBuff = (char *) calloc(1, 50);
+    memset(userBuff, '\0', 50);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    _write(0, "5", 5);
+    assert(_read((VA) 0, userBuff, -2) == -1);
+}
+
+void test_read_wrong_pointer() {
+    _init_(1, 40);
+    char *userBuff = (char *) calloc(1, 50);
+    memset(userBuff, '\0', 50);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    _write(0, "5", 5);
+    assert(_read((VA) 41, userBuff, 5) == -1);
+}
+
+void test_read_free_block() {
+    _init_(1, 40);
+    char *userBuff = (char *) calloc(1, 50);
+    memset(userBuff, '\0', 50);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    _write(0, "5", 5);
+    _free(0);
+    assert(_read(0, userBuff, 5) == 1);
+}
+
+void test_read_size_of_buffer_bigger_than_size_of_block() {
+    _init_(1, 40);
+    char *userBuff = (char *) calloc(1, 50);
+    memset(userBuff, '\0', 50);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    assert(_read(0, userBuff, 10) == -2);
+}
+
+void test_read() {
+    _init_(1, 40);
+    char *userBuff = (char *) calloc(1, 50);
+    memset(userBuff, '\0', 50);
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _malloc(p1, 5);
+    _write(0, "5", 5);
+    assert(_read((VA) 0, userBuff, 5) == 0);
+    assert(*userBuff == '5');
+}
+
 
 
 int test_all(){
@@ -102,8 +255,16 @@ int main()
 //    test_malloc_size_block_more_than_real_block_size();
 //    test_malloc_used_block();
 //    test_malloc_size_block_equals_real_block_size();
-    test_all();
-
+//    test_all();
+//    test_init_negative_page_size();
+//    test_init_huge_amount_of_memory_to_calloc();
+//    test_free_not_used_block();
+//    test_write_null_buffer();
+//    test_write_free_block();
+//    test_write_size_of_buffer_bigger_than_size_of_block();
+//    test_write();
+//    test_read_unintialized_memory();
+    test_read();
     return 0;
 }
 
