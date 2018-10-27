@@ -10,12 +10,7 @@
 #include <stdint.h>
 #include "mmemory.h"
 
-struct block {
-    struct block*	pNext;	// следующий свободный или
-    // занятый блок
-
-    unsigned int	szBlock;	// размер блока
-} *begin=NULL;
+struct block *begin = NULL;
 
 char *memory;
 unsigned int memorySize=0;

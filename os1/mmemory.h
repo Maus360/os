@@ -86,3 +86,10 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer);
 int _init_(int n, int szPage);
 
 void print();
+
+struct block {
+    struct block *pNext;    // следующий свободный или
+    // занятый блок
+
+    unsigned int szBlock;    // размер блока
+} *begin;
