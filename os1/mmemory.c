@@ -9,11 +9,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "mmemory.h"
-
 struct block *begin = NULL;
 
 char *memory;
-unsigned int memorySize=0;
+
+unsigned int memorySize = 40;
 
 
 unsigned int isUsedBlock(unsigned int x){
@@ -207,8 +207,8 @@ int _write (VA ptr, void* pBuffer, size_t szBuffer){
 
     if(pointer==NULL) return 1;
     if(pBuffer==NULL) return -1;
-    if (szBuffer < 1 || szBuffer > memorySize) return -1;
-    if(ptrBlock >= 0 && ptrBlock < memorySize){
+    if (szBuffer < 1 || szBuffer >= memorySize) return -1;
+    if (ptrBlock >= 0 && ptrBlock <= memorySize) {
         // указатель на область памяти корректен
         // находим, какому блоку принадлежит указатель
         while(pointer!=NULL){
