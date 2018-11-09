@@ -322,4 +322,16 @@ void print() {
         shift += blockSize;
         pointer = pointer->pNext;
     }
+    printf("______________________________________________\n");
+}
+
+unsigned int getMaxFreeBlockSize() {
+    unsigned int maxSize = 0;
+    struct block *pointer = begin;
+    while (pointer != NULL) {
+        if (isUsedBlock(pointer) && pointer->szBlock > maxSize)
+            maxSize = pointer->szBlock;
+        pointer = pointer->pNext;
+    }
+    return maxSize;
 }

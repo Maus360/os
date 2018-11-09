@@ -3,6 +3,11 @@
 
 typedef char *VA;                // ??? ??????????? ????? ?????
 
+#define SUCCESS 0
+#define INVALID_INPUT -1
+#define OUT_OF_MEMORY -2
+#define OUT_OF_BOUNDS_ACCESS -2
+#define UNKNOUN_ERROR 1
 
 
 /**
@@ -93,3 +98,5 @@ struct block {
 
     unsigned int szBlock;    // размер блока
 } *begin;
+
+unsigned int getMaxFreeBlockSize();

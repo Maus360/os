@@ -3,7 +3,12 @@
 #include <memory.h>
 #include <assert.h>
 #include <stdint.h>
+#include <time.h>
 #include "mmemory.h"
+
+#define TRUE 1
+#define FALSE 0
+#define SIZE 50000
 
 unsigned int _isUsedBlock(unsigned int x) {
     if (x >> (31)) return 1;
@@ -223,46 +228,133 @@ void test_read() {
     _free(*p1);
 }
 
-//void test_perfomance() {
-//    VA *p1 = (VA *) malloc(sizeof(VA));
-//    test_init();
-//    char *userBuff = (char *) calloc(1, 50);
-//    memset(userBuff, '\0', 50);
-//    _malloc(p1, 5);
-//    print();
-//    _malloc(p1, 10);
-//    print();
-//    _write(*p1, "5", 5);
-//    print();
-//    _free((VA) *p1);
-//    print();
-//    assert(_write((VA) *p1 + 5, "1", 10) == 1);
-//    print();
-//    _malloc(p1, 10);
-//    print();
-//    assert(_write((VA) *p1, "1", 10) == 0);
-//    print();
-//    assert(_read((VA) *p1, userBuff, 15) == -2);
-//    print();
-//    assert(_read((VA) *p1, userBuff, 10) == 0);
-//    print();
-//    assert(*userBuff == '1');
-//    print();
-//    _free((VA) *p1);
-//    _free(0);
-//    assert(_read(*p1, userBuff, 5) == 1);
-//    _free(*p1);
-//
-//}
+struct block *get(int number) {
+    struct block *block = begin;
+    for (int i = 0; i < number; i++) {
+        block = block->pNext;
+    }
+    return block;
+}
+
+void del(struct block *block) {
+    if (block == begin) {
+        begin = block->pNext;
+        free(begin);
+    } else {
+        struct block *pointer = begin;
+        while (pointer->pNext != NULL) {
+            if (pointer->pNext == block) pointer->pNext = block->pNext;
+            free(begin);
+            pointer = pointer->pNext;
+        }
+    }
+}
+
+void stressTesting() {
+    srand(time(0));
+    VA va = NULL;
+    unsigned int size = 0;
+    int listSize = 0;
+    struct block *block = NULL;
+
+    _init_(1, 1000);
+    for (int i = 0; i < 1000; i++) {
+        _malloc(&va, 1);
+        listSize++;
+    }
+//    for (int i = 0; i < 1000; i++)
+//    {
+//        begin = get(rand() % listSize);
+//        _free((VA) block);
+//        listSize--;
+//        size = _maxBlockSize();
+//        //printf("\t%d\t%d\t", i + 1, size);
+//    }
+
+    printf("\n");
+
+    int res = 0;
+    size = 0;
+    listSize = 0;
+    int tsize = 0;
+    int iterations = 0;
+    int sIterations = 0;
+    int start = FALSE;
+    for (double t = 0.05; t < 0.51; t += 0.02) {
+        sIterations = 0;
+        for (int iter = 0; iter < 100; iter++) {
+            _init_(1, SIZE);
+            res = 0;
+            size = 0;
+            listSize = 0;
+            iterations = 0;
+            start = FALSE;
+            do {
+                tsize = (int) (SIZE * t) + (rand() % (int) (SIZE * 0.02)) - (int) (SIZE * 0.01);
+                if (size < SIZE - tsize) {
+                    res = _malloc(&va, tsize);
+                    if (res == 0) {
+                        if (start) iterations++;
+                        _malloc(&va, tsize);
+                        listSize++;
+                        size += tsize;
+                    }
+                    va = NULL;
+                } else {
+                    start = TRUE;
+                    begin = get(rand() % listSize);
+                    res = _free((VA) block);
+                    listSize--;
+                    size -= begin->szBlock;
+                    del(begin);
+                }
+            } while (res == 0);
+            sIterations += iterations;
+        }
+        printf("\tStep: %f\tIterations maked: %f\n", t, sIterations / 100);
+    }
+}
+
+void test_perfomance() {
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    _init_(1, 10);
+    _malloc(p1, 1);
+    print();
+    _malloc(p1, 4);
+    print();
+    _malloc(p1, 5);
+    print();
+    _free((VA) 0);
+    print();
+    _free((VA) 1);
+    print();
+    _malloc(p1, 5);
+    print();
+}
 
 void test_read_11_from_14_written() {
     test_init();
     VA *p1 = (VA *) malloc(sizeof(VA));
     mallocc(p1, 10);
     mallocc(p1, 20);
-    char *buff = calloc(11 * sizeof(char), 11 * sizeof(char));
+    char *buff = calloc(1, 50);
+    _write(*p1 + 2, "testmyfunc", 14);
     assert(_read(*p1 + 4, buff, 11) == 0);
-    free(buff);
+    printf("%s\n", buff);
+    _free(*p1);
+}
+
+void test_read_11_from_14_written_buff() {
+    test_init();
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    mallocc(p1, 10);
+    mallocc(p1, 20);
+    char *buff = calloc(1, 50);
+    _write(*p1 + 2, "testmyfunc", 14);
+    _read(*p1 + 4, buff, 11);
+    char *p = "stmyfunc";
+    assert(*buff == *p);
+    printf("%s\n", buff);
     _free(*p1);
 }
 
@@ -270,9 +362,23 @@ void test_read_5_from_14_written_with_offset() {
     test_init();
     VA *p1 = (VA *) malloc(sizeof(VA));
     mallocc(p1, 40);
-    char *buff = calloc(5 * sizeof(char), 5 * sizeof(char));
+    char *buff = calloc(1, 50);
+    _write(*p1, "testmy", 14);
     assert(_read(*p1 + 4, buff, 5) == 0);
-    free(buff);
+    printf("%s\n", buff);
+    _free(*p1);
+}
+
+void test_read_5_from_14_written_with_offset_buff() {
+    test_init();
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    mallocc(p1, 40);
+    char *buff = calloc(1, 50);
+    _write(*p1, "testmy", 14);
+    _read(*p1 + 4, buff, 5);
+    char *p = "my";
+    assert(*buff == *p);
+    printf("%s\n", buff);
     _free(*p1);
 }
 
@@ -280,9 +386,22 @@ void test_read_3_with_4_written() {
     test_init();
     VA *p1 = (VA *) malloc(sizeof(VA));
     mallocc(p1, 20);
-    char *buff = calloc(3 * sizeof(char), 3 * sizeof(char));
+    char *buff = calloc(1, 50);
+    _write(*p1, "lolz", 4);
     assert(_read(*p1, buff, 3) == 0);
-    free(buff);
+    printf("%s\n", buff);
+}
+
+void test_read_3_with_4_written_buff() {
+    test_init();
+    VA *p1 = (VA *) malloc(sizeof(VA));
+    mallocc(p1, 20);
+    char *buff = calloc(1, 50);
+    _write(*p1, "lolz", 4);
+    _read(*p1, (void *) buff, 3);
+    char *p = "lol";
+    assert(*buff == *p);
+    printf("%s\n", buff);
 }
 
 int test_all() {
@@ -374,41 +493,16 @@ int main()
                          test_read_3_with_4_written,
                          test_read_5_from_14_written_with_offset,
                          test_read_11_from_14_written,
-                         test_all
+                         test_read_3_with_4_written_buff,
+                         test_read_5_from_14_written_with_offset_buff,
+                         test_read_11_from_14_written_buff,
+                         test_perfomance
     };
-    int length = *(&tests + 1) - tests;
+    int length = (int) (*(&tests + 1) - tests);
     printf("%d\n", length);
     for (int i = 0; i < length; i++) {
         (*tests[i])();
         printf("%d test has complete\n", i + 1);
     }
-//    test_all();
-//    test_perfomance();
-//    test_write_size_of_buffer_bigger_than_size_of_block();
-//    test_write();
-//    test_write_free_block();
-//    test_write_wrong_pointer();
-//    test_write_wrong_size_buffer();
-//    test_write_null_buffer();
-//    test_read_free_block();
-//    test_read();
-//    test_read_null_buffer();
-//    test_read_size_of_buffer_bigger_than_size_of_block();
-//    test_read_wrong_pointer();
-//    test_read_wrong_size_buffer();
-//    test_malloc_size_block_equals_real_block_size();
-//    test_malloc_size_block_less_than_real_block_size();
-//    test_malloc_size_block_more_than_real_block_size();
-//    test_malloc_used_block();
-//    test_free_used_block();
-//    test_free_not_enougth_memory();
-//    test_free_not_used_block();
-//    test_read_free_block();
-//    test_init_negative_page_size();
-//    test_init_negative_page_count();
-//    test_read_3_with_4_written();
-//    test_read_5_from_14_written_with_offset();
-//    test_read_11_from_14_written();
-//    printf("26 tests accepted");
     return 0;
 }
